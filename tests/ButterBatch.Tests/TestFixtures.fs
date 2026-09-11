@@ -5,11 +5,13 @@ open ButterBatch.Domain
 
 let scale stable value token : DeviceReading =
     { Kind = Scale; Value = value; Stable = stable
-      At = DateTime(2026, 9, 11, 9, 0, 0); Token = token; Raw = sprintf "ST,gs,%f" value }
+      At = DateTime(2026, 9, 11, 9, 0, 0); Token = token
+      Raw = sprintf "ST,gs,%f" value; ReadingId = Guid.NewGuid() }
 
 let meter stable value token : DeviceReading =
     { Kind = MoistureMeter; Value = value; Stable = stable
-      At = DateTime(2026, 9, 11, 9, 30, 0); Token = token; Raw = sprintf "OK,m,%f" value }
+      At = DateTime(2026, 9, 11, 9, 30, 0); Token = token
+      Raw = sprintf "OK,m,%f" value; ReadingId = Guid.NewGuid() }
 
 type World =
     { Tokens: Guid Set
@@ -46,7 +48,7 @@ let drainButtermilk (w: World) (qty: decimal) (dest: string option) b =
           Material = "酪乳"; Lot = Some "BM-1"; Source = Some "搅拌缸"
           Destination = dest
           QuantityKg = Some qty
-          ScaleReading = Some { w.ScaleStable with Value = qty }
+          ScaleReading = Some { w.ScaleStable with Value = qty; ReadingId = Guid.NewGuid() }
           By = "张操作" }
     match Rules.logMaterial b ev w.Tokens with Ok b' -> b' | Error e -> failwith (string e)
 
@@ -60,12 +62,12 @@ let closedBatch (w: World) : ButterBatch =
     // 酪乳排净，去向 = 酪乳回收罐 R-2，18kg
     b <- drainButtermilk w 18m (Some "酪乳回收罐 R-2") b
     // 加盐两次
-    b <- Rules.addSalt b "SALT-A" 0.9m { w.ScaleStable with Value = 0.9m } w.Tokens "张操作" DateTime.Now |> okOrFail
-    b <- Rules.addSalt b "SALT-B" 0.6m { w.ScaleStable with Value = 0.6m } w.Tokens "张操作" DateTime.Now |> okOrFail
+    b <- Rules.addSalt b "SALT-A" 0.9m { w.ScaleStable with Value = 0.9m; ReadingId = Guid.NewGuid() } w.Tokens "张操作" DateTime.Now |> okOrFail
+    b <- Rules.addSalt b "SALT-B" 0.6m { w.ScaleStable with Value = 0.6m; ReadingId = Guid.NewGuid() } w.Tokens "张操作" DateTime.Now |> okOrFail
     // 分块：投入 100 + 1.5 = 101.5；产出 83.5 + 酪乳 18 = 101.5
-    b <- Rules.cutBlock b 28.0m "L-1" (Some { w.ScaleStable with Value = 28.0m }) w.Tokens "张操作" DateTime.Now |> okOrFail
-    b <- Rules.cutBlock b 28.0m "L-2" (Some { w.ScaleStable with Value = 28.0m }) w.Tokens "张操作" DateTime.Now |> okOrFail
-    b <- Rules.cutBlock b 27.5m "L-3" (Some { w.ScaleStable with Value = 27.5m }) w.Tokens "张操作" DateTime.Now |> okOrFail
+    b <- Rules.cutBlock b 28.0m "L-1" (Some { w.ScaleStable with Value = 28.0m; ReadingId = Guid.NewGuid() }) w.Tokens "张操作" DateTime.Now |> okOrFail
+    b <- Rules.cutBlock b 28.0m "L-2" (Some { w.ScaleStable with Value = 28.0m; ReadingId = Guid.NewGuid() }) w.Tokens "张操作" DateTime.Now |> okOrFail
+    b <- Rules.cutBlock b 27.5m "L-3" (Some { w.ScaleStable with Value = 27.5m; ReadingId = Guid.NewGuid() }) w.Tokens "张操作" DateTime.Now |> okOrFail
     // 每块 6 个冻结点位取样（温度合格），并发布水盐结果
     for block in b.Blocks do
         for pos in Positions.frozen do

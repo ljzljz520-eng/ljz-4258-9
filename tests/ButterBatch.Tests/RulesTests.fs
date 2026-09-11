@@ -75,8 +75,8 @@ let ``两次加盐次序连续且各自带材料批号`` () =
     let mutable b = Rules.createBatch "CR-001" "张操作" 100m w.ScaleStable w.Tokens DateTime.Now |> okOrFail
     for st in [ ButtermilkDrain; Washing; Salting ] do
         b <- Rules.confirmStage b st b.CreamLot "张操作" None DateTime.Now |> okOrFail
-    b <- Rules.addSalt b "SALT-A" 0.9m { w.ScaleStable with Value = 0.9m } w.Tokens "张操作" DateTime.Now |> okOrFail
-    b <- Rules.addSalt b "SALT-B" 0.6m { w.ScaleStable with Value = 0.6m } w.Tokens "张操作" DateTime.Now |> okOrFail
+    b <- Rules.addSalt b "SALT-A" 0.9m { w.ScaleStable with Value = 0.9m; ReadingId = Guid.NewGuid() } w.Tokens "张操作" DateTime.Now |> okOrFail
+    b <- Rules.addSalt b "SALT-B" 0.6m { w.ScaleStable with Value = 0.6m; ReadingId = Guid.NewGuid() } w.Tokens "张操作" DateTime.Now |> okOrFail
     Assert.Equal(2, b.SaltAdditions.Length)
     Assert.Equal<string>(ResizeArray [ "SALT-A"; "SALT-B" ], ResizeArray (b.SaltAdditions |> List.map (fun s -> s.SaltLot)))
 

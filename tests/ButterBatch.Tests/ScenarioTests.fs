@@ -36,7 +36,7 @@ let ``场景1b-登记了排酪乳但没有去向也判未排净`` () =
     let ev = { EventId = Guid.NewGuid(); Stage = ButtermilkDrain; At = DateTime.Now
                Material = "酪乳"; Lot = Some "BM"; Source = Some "搅拌缸"
                Destination = None; QuantityKg = Some 18m
-               ScaleReading = Some { w.ScaleStable with Value = 18m }; By = "张操作" }
+               ScaleReading = Some { w.ScaleStable with Value = 18m; ReadingId = Guid.NewGuid() }; By = "张操作" }
     b <- Rules.logMaterial b ev w.Tokens |> okOrFail
     Assert.Equal(Error ButtermilkNotDrained, Rules.checkButtermilkDrained b)
 
@@ -50,9 +50,9 @@ let ``场景2-盐可分两次加入且两次材料批号与读数分别对应`` 
     let mutable b = Rules.createBatch "CR-777" "张操作" 100m w.ScaleStable w.Tokens DateTime.Now |> okOrFail
     for st in [ ButtermilkDrain; Washing; Salting ] do
         b <- Rules.confirmStage b st b.CreamLot "张操作" None DateTime.Now |> okOrFail
-    let r1 = { w.ScaleStable with Value = 0.9m }
+    let r1 = { w.ScaleStable with Value = 0.9m; ReadingId = Guid.NewGuid() }
     b <- Rules.addSalt b "SALT-A" 0.9m r1 w.Tokens "张操作" DateTime.Now |> okOrFail
-    let r2 = { w.ScaleStable with Value = 0.6m }
+    let r2 = { w.ScaleStable with Value = 0.6m; ReadingId = Guid.NewGuid() }
     b <- Rules.addSalt b "SALT-B" 0.6m r2 w.Tokens "张操作" DateTime.Now |> okOrFail
 
     Assert.Equal(2, b.SaltAdditions.Length)
@@ -70,7 +70,7 @@ let ``场景2b-第二次加盐使用未稳定读数被拒`` () =
     let mutable b = Rules.createBatch "CR-777" "张操作" 100m w.ScaleStable w.Tokens DateTime.Now |> okOrFail
     for st in [ ButtermilkDrain; Washing; Salting ] do
         b <- Rules.confirmStage b st b.CreamLot "张操作" None DateTime.Now |> okOrFail
-    b <- Rules.addSalt b "SALT-A" 0.9m { w.ScaleStable with Value = 0.9m } w.Tokens "张操作" DateTime.Now |> okOrFail
+    b <- Rules.addSalt b "SALT-A" 0.9m { w.ScaleStable with Value = 0.9m; ReadingId = Guid.NewGuid() } w.Tokens "张操作" DateTime.Now |> okOrFail
     let r = Rules.addSalt b "SALT-B" 0.6m { w.ScaleUnstable with Value = 0.6m } w.Tokens "张操作" DateTime.Now
     Assert.True(match r with Error(ReadingNotStable Scale) -> true | _ -> false)
 

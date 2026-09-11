@@ -8,6 +8,7 @@
     <Compile Include="TestFixtures.fs" />
     <Compile Include="RulesTests.fs" />
     <Compile Include="ScenarioTests.fs" />
+    <Compile Include="ReworkTests.fs" />
     <Compile Include="StorageTests.fs" />
   </ItemGroup>
   <ItemGroup>

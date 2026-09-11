@@ -97,7 +97,7 @@ type SerialBridge(repo: BatchRepository, port: int) =
                 let reading =
                     { Kind = kind; Value = value; Stable = stable
                       At = if at.Kind = DateTimeKind.Utc then at.ToLocalTime() else at
-                      Token = token; Raw = raw }
+                      Token = token; Raw = raw; ReadingId = Guid.NewGuid() }
                 // 原始读数留痕（批次尚未绑定也先记录到空批次审计集合）
                 repo.SaveReading(Guid.Empty, reading)
                 received.Trigger(null, ReadingReceivedEventArgs reading)

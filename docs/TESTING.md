@@ -4,7 +4,24 @@
 ```bash
 dotnet test ButterBatch.sln
 ```
-当前：**29 个测试全部通过**。
+当前：**35 个测试全部通过**。
+
+## 返捏合分支场景（ReworkTests.fs）
+
+1. **返工混入另一批（R1）**：整块 28kg 指定返工即刻 `ReworkFrozen`，原水盐结果不可再取样；
+   合并后源块 `ReworkedOut`，目标批 `IncomingReworks` 记录 28kg 谱系边（来源批+工单+逐块并入读数）；
+   在目标批重新分块 RW-1、新增 6 点取样并发布、`completeRework` 关单；源批 2/3 号块保持独立，两批各自物料闭合。
+2. **只返捏合半块（R2）**：28kg 块指定返 12kg 必须登记保留标签；并入量必须等于指定量（10kg 被 `ReworkQtyInvalid` 拒）；
+   原 1 号块冻结留痕，剩余 16kg 另立独立块（`SplitFromBlockNo=1`，保留 L-1），原冻结 6 点结果不继承，剩余块与返工新块都重新取样。
+3. **标签在软化中脱落（R3）**：脱落未补贴时 `LabelMissing=true`，取样/放行/总检查全部被 `LabelDetached` 阻塞；
+   复用脱落标签 L-2 判 `LabelReuseDetached`，占用在用标签判 `LabelMismatch`；补贴新标签 L-2R 后恢复，旧标签分块复用仍被拒。
+4. **返工后重新分块（R4）**：新块重量之和必须等于并入量（14+13≠27.5 判 `ReworkOutputNotClosed`）；
+   标签占用被拒；新块只有表层样不能关单（`SurfaceSamplesOnly`），覆盖齐备后关单并记录 `OutputBlockNos`。
+5. **原批已有部分放行（R5）**：已发布结果的 1 号块先 `releaseBlock` 放行；已放行块再指定返工判 `BlockAlreadyReleased`；
+   3 号块返工不影响 1（`Released`）、2（`Intact`）号块，整批仍闭合可发布。
+
+另有 `StorageTests` 的返工 LiteDB 往返：工单/逐块并入明细/外来返工料/标签事件/块状态/半块剩余溯源均可重建，
+且同一工单分别存入源批与目标批不产生主键冲突；读数改用稳定 `ReadingId` 建键，同授权令牌的多条读数不再互相覆盖。
 
 ## 指定的五个场景（ScenarioTests.fs）
 
