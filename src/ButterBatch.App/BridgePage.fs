@@ -96,8 +96,8 @@ async function setup(cfg){
   $(cfg.sendId).onclick=()=>send().catch(e=>log($(cfg.logId),"发送错误: "+e));
   $(cfg.releaseId).onclick=()=>release().catch(e=>log($(cfg.logId),"释放错误: "+e));
 }
-setup({kind:"scale",token:SCALE_TOKEN,baud:9600,pickId:"scalePick",sendId:"scaleSend",releaseId:"scaleRelease",stateId:"scaleState",logId:"scaleLog"});
-setup({kind:"moisture",token:METER_TOKEN,baud:9600,pickId:"meterPick",sendId:"meterSend",releaseId:"meterRelease",stateId:"meterState",logId:"meterLog"});
+setup({kind:"scale",token:"__SCALE_TOKEN__",baud:9600,pickId:"scalePick",sendId:"scaleSend",releaseId:"scaleRelease",stateId:"scaleState",logId:"scaleLog"});
+setup({kind:"moisture",token:"__METER_TOKEN__",baud:9600,pickId:"meterPick",sendId:"meterSend",releaseId:"meterRelease",stateId:"meterState",logId:"meterLog"});
 </script>
 </body></html>"""
         ).Replace("__SCALE_TOKEN__", tokenScale).Replace("__METER_TOKEN__", tokenMeter)

@@ -4,7 +4,7 @@
 ```bash
 dotnet test ButterBatch.sln
 ```
-当前：**28 个测试全部通过**。
+当前：**29 个测试全部通过**。
 
 ## 指定的五个场景（ScenarioTests.fs）
 
