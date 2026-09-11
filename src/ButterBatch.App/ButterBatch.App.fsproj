@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <NoWarn>$(NoWarn);FS3261</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="0.10.22" />
+    <PackageReference Include="Avalonia.Desktop" Version="0.10.22" />
+    <PackageReference Include="Avalonia.Controls.DataGrid" Version="0.10.22" />
+    <PackageReference Include="OxyPlot.Avalonia" Version="2.1.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ButterBatch.Domain\ButterBatch.Domain.fsproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BridgePage.fs" />
+    <Compile Include="SerialBridge.fs" />
+    <Compile Include="MainWindow.fs" />
+    <Compile Include="App.fs" />
+  </ItemGroup>
+</Project>
